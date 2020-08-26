@@ -1,0 +1,8 @@
+/.settings
+/libs
+/obj
+/resources
+.cproject
+.project
+!.h
+!.cpp
