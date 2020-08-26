@@ -84,8 +84,8 @@ static void onUI_quit() {
  * 串口数据回调接口
  */
 static void onProtocolDataUpdate(const SProtocolData &data) {
-	LOGD(" read data  %x !!!\n", data.power);
-	mTextView1Ptr->setText(data.power);
+	LOGD(" read data  %x !!!\n", data.ProtocolData[0]);
+	mTextView1Ptr->setText(data.ProtocolData[0]);
 }
 
 /**
@@ -99,9 +99,9 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
  *             停止运行当前定时器
  */
 static bool onUI_Timer(int id){
-	BYTE data [8]={0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
+	BYTE data [PROTOCOL_DATA_LEN]={0x01,0x02,0x03,0x04};
 //	LOGD(" send data  %x !!!\n", *data);
-	sendProtocol(0, data, 8);
+	sendProtocol(0, data,PROTOCOL_DATA_LEN);
     return true;
 }
 

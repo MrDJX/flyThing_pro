@@ -20,7 +20,7 @@
 /**************************************************/
 
 typedef struct {
-	BYTE power;
+	BYTE ProtocolData[PROTOCOL_DATA_LEN];
 } SProtocolData;
 
 #endif /* _UART_PROTOCOL_DATA_H_ */

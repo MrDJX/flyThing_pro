@@ -69,7 +69,7 @@ static void procParse(const BYTE *pData, UINT len) {
 	// CmdID
 	switch (MAKEWORD(pData[3], pData[2])) {
 	case CMDID_POWER:
-		sProtocolData.power = pData[6];
+		sProtocolData.ProtocolData[0] = pData[6];
 		break;
 	}
 
@@ -102,7 +102,7 @@ int parseProtocol(const BYTE *pData, UINT len) {
 			break;
 		}
 
-		dataLen = pData[4];
+		dataLen = PROTOCOL_DATA_LEN;
 		frameLen = dataLen + DATA_PACKAGE_MIN_LEN;
 		if (frameLen > remainLen) {
 			// 数据内容不全

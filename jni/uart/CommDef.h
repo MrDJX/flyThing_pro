@@ -52,11 +52,13 @@ typedef unsigned short  UINT16;
 #ifdef PRO_SUPPORT_CHECK_SUM
 #define DATA_PACKAGE_MIN_LEN		6
 #else
-#define DATA_PACKAGE_MIN_LEN		5
+#define DATA_PACKAGE_MIN_LEN		4
 #endif
 
 // 同步帧头
 #define CMD_HEAD1	0xAA
 #define CMD_HEAD2	0x54
+//协议数据长度
+#define PROTOCOL_DATA_LEN 4
 
 #endif /* _UART_COMMDEF_H_ */

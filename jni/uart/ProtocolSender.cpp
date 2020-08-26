@@ -29,9 +29,9 @@ bool sendProtocol(const UINT16 cmdID, const BYTE *pData, BYTE len) {
 	dataBuf[2] = HIBYTE(cmdID);
 	dataBuf[3] = LOBYTE(cmdID);		// 命令字节
 
-	dataBuf[4] = len;
+//	dataBuf[4] = len;
 
-	UINT frameLen = 5;
+	UINT frameLen = PROTOCOL_DATA_LEN;
 
 	// 数据
 	for (int i = 0; i < len; ++i) {
