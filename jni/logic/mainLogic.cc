@@ -84,8 +84,8 @@ static void onUI_quit() {
  * 串口数据回调接口
  */
 static void onProtocolDataUpdate(const SProtocolData &data) {
-	LOGD(" read data  %x !!!\n", data.ProtocolData[0]);
-	mTextView1Ptr->setText(data.ProtocolData[0]);
+//	LOGD(" read data  %x !!!\n", data.ProtocolData[0]);
+//	mTextView1Ptr->setText(data.ProtocolData[0]);
 }
 
 /**
@@ -100,7 +100,7 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
  */
 static bool onUI_Timer(int id){
 //	LOGD(" send data  %x !!!\n", *data);
-	BYTE data[4]={0x01,0x02,0x03,0x04};
+	BYTE data[6]={0x01,0x02,0x03,0x04,0x05,0x06};
 	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
 	sSendProtocolData.CmdCtrlNum=0x010a;
 	sendProtocol(sSendProtocolData.CmdCtrlNum,sSendProtocolData.SendProtocolData,PROTOCOL_DATA_LEN);

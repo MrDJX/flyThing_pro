@@ -22,7 +22,8 @@ bool sendProtocol(const UINT16 cmdID, const BYTE *pData, BYTE len) {
 	}
 
 	BYTE dataBuf[256];
-
+	int dataBufLen;
+	dataBufLen = len+DATA_PACKAGE_MIN_LEN;
 	dataBuf[0] = FRAME_HEAD1;
 	dataBuf[1] = FRAME_HEAD2;			// 同步帧头
 
@@ -31,20 +32,29 @@ bool sendProtocol(const UINT16 cmdID, const BYTE *pData, BYTE len) {
 
 //	dataBuf[4] = len;
 
-	UINT frameLen = PROTOCOL_DATA_LEN;
+	UINT frameLen = 4;
 
 	// 数据
 	for (int i = 0; i < len; ++i) {
 		dataBuf[frameLen] = pData[i];
 		frameLen++;
 	}
-	dataBuf[frameLen]=FRAME_END1;
-	dataBuf[frameLen+1]=FRAME_END2;
-
 #ifdef PRO_SUPPORT_CHECK_SUM
 	// 校验码
 	dataBuf[frameLen] = getCheckSum(dataBuf, frameLen);
 	frameLen++;
 #endif
-	return UARTCONTEXT->send(dataBuf, frameLen+2);
+#ifdef PRO_SUPPORT_FRAME_END
+	dataBuf[frameLen]=FRAME_END1;
+	frameLen++;
+	dataBuf[frameLen]=FRAME_END2; // 同步帧尾
+	frameLen++;
+#endif
+#ifdef DEBUG_PRO_DATA
+		for (UINT i = 0; i < frameLen; ++i) {
+			LOGD("tx:%x ", dataBuf[i]);
+		}
+		LOGD("\n");
+#endif
+	return UARTCONTEXT->send(dataBuf, frameLen);
 }

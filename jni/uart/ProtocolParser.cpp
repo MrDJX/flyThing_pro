@@ -55,11 +55,11 @@ SProtocolData& getProtocolData() {
  */
 BYTE getCheckSum(const BYTE *pData, int len) {
 	int sum = 0;
-	for (int i = 0; i < len; ++i) {
+	for (int i = 2; i < len; ++i) {
 		sum += pData[i];
 	}
 
-	return (BYTE) (~sum + 1);
+	return (BYTE) (sum&0xff);//sum%256
 }
 
 /**
@@ -103,7 +103,8 @@ int parseProtocol(const BYTE *pData, UINT len) {
 		}
 
 		dataLen = PROTOCOL_DATA_LEN;
-		frameLen = dataLen + DATA_PACKAGE_MIN_LEN;
+		frameLen = dataLen + DATA_PACKAGE_MIN_LEN -1;
+		LOGD("frameLen %d ", frameLen);
 		if (frameLen > remainLen) {
 			// 数据内容不全
 			break;
@@ -112,25 +113,42 @@ int parseProtocol(const BYTE *pData, UINT len) {
 		// 打印一帧数据，需要时在CommDef.h文件中打开DEBUG_PRO_DATA宏
 #ifdef DEBUG_PRO_DATA
 		for (UINT i = 0; i < frameLen; ++i) {
-			LOGD("%x ", pData[i]);
+			LOGD("rx:%x ", pData[i]);
 		}
 		LOGD("\n");
 #endif
-
-		// 支持checksum校验，需要时在CommDef.h文件中打开PRO_SUPPORT_CHECK_SUM宏
-#ifdef PRO_SUPPORT_CHECK_SUM
-		// 检测校验码
-		if (getCheckSum(pData, frameLen - 1) == pData[frameLen - 1]) {
+#if (PRO_SUPPORT_CHECK_SUM_FLAG&PRO_SUPPORT_FRAME_END_FLAG)
+		// 检测校验码,检测到帧尾
+		if ((getCheckSum(pData, frameLen-3) \
+				== pData[frameLen-3])\
+				&&(pData[frameLen - 2] == FRAME_END1) \
+				&&(pData[frameLen - 1] == FRAME_END2)) {
+			// 解析一帧数据
+			procParse(pData, frameLen);
+		} else {
+			LOGE("CheckSum FRAME_END error!!!!!!\n");
+		}
+#else
+	#if (PRO_SUPPORT_CHECK_SUM_FLAG==1)
+		if ((getCheckSum(pData, frameLen-(DATA_PACKAGE_MIN_LEN-PROTOCOL_DATA_LEN))\
+				== pData[frameLen-(DATA_PACKAGE_MIN_LEN-PROTOCOL_DATA_LEN)])){
 			// 解析一帧数据
 			procParse(pData, frameLen);
 		} else {
 			LOGE("CheckSum error!!!!!!\n");
 		}
-#else
-		// 解析一帧数据
+	#elif(PRO_SUPPORT_FRAME_END_FLAG==1)
+		if ((pData[frameLen - 2] == FRAME_END1) \
+			&&(pData[frameLen - 1] == FRAME_END2)) {
+			// 解析一帧数据
+			procParse(pData, frameLen);
+		} else {
+			LOGE("FRAME_END error!!!!!!\n");
+		}
+	#else
 		procParse(pData, frameLen);
+	#endif
 #endif
-
 		pData += frameLen;
 		remainLen -= frameLen;
 	}
