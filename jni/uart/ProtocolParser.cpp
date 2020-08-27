@@ -63,7 +63,7 @@ BYTE getCheckSum(const BYTE *pData, int len) {
 }
 
 /**
- * 解析每一帧数据
+ * 解析每一帧数据,缓存到结构体数组中
  */
 static void procParse(const BYTE *pData, UINT len) {
 	// CmdID
@@ -92,7 +92,7 @@ int parseProtocol(const BYTE *pData, UINT len) {
 	 */
 	while (remainLen >= DATA_PACKAGE_MIN_LEN) {
 		// 找到一帧数据的数据头
-		while ((remainLen >= 2) && ((pData[0] != CMD_HEAD1) || (pData[1] != CMD_HEAD2))) {
+		while ((remainLen >= 2) && ((pData[0] != FRAME_HEAD1) || (pData[1] != FRAME_HEAD2))) {
 			pData++;
 			remainLen--;
 			continue;

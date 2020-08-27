@@ -1,6 +1,6 @@
 #pragma once
 #include "uart/ProtocolSender.h"
-
+static SSendProtocolData sSendProtocolData;
 /*
 *此文件由GUI工具生成
 *文件功能：用于处理用户的逻辑相应代码
@@ -99,9 +99,11 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
  *             停止运行当前定时器
  */
 static bool onUI_Timer(int id){
-	BYTE data [PROTOCOL_DATA_LEN]={0x01,0x02,0x03,0x04};
 //	LOGD(" send data  %x !!!\n", *data);
-	sendProtocol(0, data,PROTOCOL_DATA_LEN);
+	BYTE data[4]={0x01,0x02,0x03,0x04};
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=0x010a;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,sSendProtocolData.SendProtocolData,PROTOCOL_DATA_LEN);
     return true;
 }
 

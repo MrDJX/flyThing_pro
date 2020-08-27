@@ -23,8 +23,8 @@ bool sendProtocol(const UINT16 cmdID, const BYTE *pData, BYTE len) {
 
 	BYTE dataBuf[256];
 
-	dataBuf[0] = CMD_HEAD1;
-	dataBuf[1] = CMD_HEAD2;			// 同步帧头
+	dataBuf[0] = FRAME_HEAD1;
+	dataBuf[1] = FRAME_HEAD2;			// 同步帧头
 
 	dataBuf[2] = HIBYTE(cmdID);
 	dataBuf[3] = LOBYTE(cmdID);		// 命令字节
@@ -38,11 +38,13 @@ bool sendProtocol(const UINT16 cmdID, const BYTE *pData, BYTE len) {
 		dataBuf[frameLen] = pData[i];
 		frameLen++;
 	}
+	dataBuf[frameLen]=FRAME_END1;
+	dataBuf[frameLen+1]=FRAME_END2;
 
 #ifdef PRO_SUPPORT_CHECK_SUM
 	// 校验码
 	dataBuf[frameLen] = getCheckSum(dataBuf, frameLen);
 	frameLen++;
 #endif
-	return UARTCONTEXT->send(dataBuf, frameLen);
+	return UARTCONTEXT->send(dataBuf, frameLen+2);
 }
