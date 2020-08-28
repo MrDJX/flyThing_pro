@@ -18,9 +18,14 @@
 /******************** 错误码 ***********************/
 #define ERROR_CODE_CMDID			1
 /**************************************************/
-
+//RX接收读取数据缓存帧结构体
 typedef struct {
+	BYTE Frame_Head[2];
+	BYTE Cmd_Byte;
+	BYTE ID_Byte;
 	BYTE ProtocolData[PROTOCOL_DATA_LEN];
+	BYTE Check_Byte;
+	BYTE Frame_End[2];
 } SProtocolData;
 
 #endif /* _UART_PROTOCOL_DATA_H_ */

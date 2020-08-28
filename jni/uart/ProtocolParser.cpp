@@ -67,12 +67,23 @@ BYTE getCheckSum(const BYTE *pData, int len) {
  */
 static void procParse(const BYTE *pData, UINT len) {
 	// CmdID
-	switch (MAKEWORD(pData[3], pData[2])) {
-	case CMDID_POWER:
-		sProtocolData.ProtocolData[0] = pData[6];
-		break;
-	}
-
+#ifdef DEBUG_procPars_DATA
+		for (UINT i = 0; i < len; ++i) {
+			LOGD("procParse:%x ", pData[i]);
+		}
+		LOGD("\n");
+#endif
+	sProtocolData.Frame_Head[0]    = pData[0];
+	sProtocolData.Frame_Head[1]    = pData[1];
+	sProtocolData.Cmd_Byte         = pData[2];
+	sProtocolData.ID_Byte          = pData[3];
+	sProtocolData.ProtocolData[0]  = pData[4];
+	sProtocolData.ProtocolData[1]  = pData[5];
+	sProtocolData.ProtocolData[2]  = pData[6];
+	sProtocolData.ProtocolData[3]  = pData[7];
+	sProtocolData.Check_Byte       = pData[8];
+	sProtocolData.Frame_End[0]     = pData[9];
+	sProtocolData.Frame_End[1]     = pData[10];
 	// 通知协议数据更新
 	notifyProtocolDataUpdate(sProtocolData);
 }

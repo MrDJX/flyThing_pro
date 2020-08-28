@@ -30,7 +30,19 @@ static SSendProtocolData sSendProtocolData;
 *
 * 在Eclipse编辑器中  使用 “alt + /”  快捷键可以打开智能提示
 */
+typedef struct {
+	const char* mainText;
+	const char* subText;
+} S_TEST_DATA;
 
+static S_TEST_DATA sDataTestTab[] = {
+	{ "帧头", 		"01 02" 		},
+	{ "命令字", 		"0a" 			},
+	{ "序列号", 		"0a"			},
+	{ "数据位", 		"01 02 03 04" 	},
+	{ "校验位", 		"0a" 			},
+	{ "帧尾", 		"01 02" 		}
+};
 
 /**
  * 注册定时器
@@ -47,7 +59,7 @@ static S_ACTIVITY_TIMEER REGISTER_ACTIVITY_TIMER_TAB[1] = {
  */
 static void onUI_init(){
     //Tips :添加 UI初始化的显示代码到这里,如:mText1Ptr->setText("123");
-	mTextView1Ptr->setText("123");
+//	mTextView1Ptr->setText("123");
 }
 
 /**
@@ -84,8 +96,26 @@ static void onUI_quit() {
  * 串口数据回调接口
  */
 static void onProtocolDataUpdate(const SProtocolData &data) {
-//	LOGD(" read data  %x !!!\n", data.ProtocolData[0]);
-//	mTextView1Ptr->setText(data.ProtocolData[0]);
+
+//	LOGD(" read data 0x%x 0x%x !!!\n", data.Frame_Head[0],data.Frame_Head[1]);
+	char buf[16],buf1[16],buf2[16],buf3[16],buf4[16],buf5[16];
+	snprintf(buf, sizeof(buf), "%02x %02x", data.Frame_Head[0],data.Frame_Head[1]);
+	sDataTestTab[0].subText=buf;
+	snprintf(buf1, sizeof(buf1), "%02x", data.Cmd_Byte);
+	sDataTestTab[1].subText=buf1;
+	snprintf(buf2, sizeof(buf2), "%02x", data.ID_Byte);
+	sDataTestTab[2].subText=buf2;
+	snprintf(buf3, sizeof(buf3), "%02x %02x %02x %02x", data.ProtocolData[0],\
+											  data.ProtocolData[1],\
+											  data.ProtocolData[2],\
+											  data.ProtocolData[3]);
+	sDataTestTab[3].subText=buf3;
+	snprintf(buf4, sizeof(buf4), "%02x", data.Check_Byte);
+	sDataTestTab[4].subText=buf4;
+	snprintf(buf5, sizeof(buf5), "%02x %02x", data.Frame_End[0],data.Frame_End[1]);
+	sDataTestTab[5].subText=buf5;
+//	LOGD(" sDataTestTab %s !!!\n", sDataTestTab[0].subText);
+	mListView1Ptr->refreshListView();
 }
 
 /**
@@ -100,7 +130,7 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
  */
 static bool onUI_Timer(int id){
 //	LOGD(" send data  %x !!!\n", *data);
-	BYTE data[6]={0x01,0x02,0x03,0x04,0x05,0x06};
+	BYTE data[4]={0x01,0x02,0x03,0x04};
 	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
 	sSendProtocolData.CmdCtrlNum=0x010a;
 	sendProtocol(sSendProtocolData.CmdCtrlNum,sSendProtocolData.SendProtocolData,PROTOCOL_DATA_LEN);
@@ -138,4 +168,19 @@ static bool onButtonClick_Button1(ZKButton *pButton) {
 static void onEditTextChanged_EditText1(const std::string &text) {
     LOGD(" onEditTextChanged_ EditText1 %s !!!\n", text.c_str());
 
+}
+static int getListItemCount_ListView1(const ZKListView *pListView) {
+    //LOGD("getListItemCount_ListView1 !\n");
+    return (sizeof(sDataTestTab) / sizeof(S_TEST_DATA));
+}
+
+static void obtainListItemData_ListView1(ZKListView *pListView,ZKListView::ZKListItem *pListItem, int index) {
+    //LOGD(" obtainListItemData_ ListView1  !!!\n");
+	ZKListView::ZKListSubItem* psubText = pListItem->findSubItemByID(ID_MAIN_SubItem1);
+	psubText->setText(sDataTestTab[index].subText);
+	pListItem->setText(sDataTestTab[index].mainText);
+}
+
+static void onListItemClick_ListView1(ZKListView *pListView, int index, int id) {
+    //LOGD(" onListItemClick_ ListView1  !!!\n");
 }

@@ -4,6 +4,8 @@
 #include "mainActivity.h"
 
 /*TAG:GlobalVariable全局变量*/
+static ZKTextView* mTextView2Ptr;
+static ZKListView* mListView1Ptr;
 static ZKTextView* mTextView1Ptr;
 static ZKEditText* mEditText1Ptr;
 static ZKButton* mButton1Ptr;
@@ -70,6 +72,7 @@ typedef struct {
 }S_ListViewFunctionsCallback;
 /*TAG:ListViewFunctionsCallback*/
 static S_ListViewFunctionsCallback SListViewFunctionsCallbackTab[] = {
+    ID_MAIN_ListView1, getListItemCount_ListView1, obtainListItemData_ListView1, onListItemClick_ListView1,
 };
 
 
@@ -126,6 +129,8 @@ const char* mainActivity::getAppName() const{
 //TAG:onCreate
 void mainActivity::onCreate() {
 	Activity::onCreate();
+    mTextView2Ptr = (ZKTextView*)findControlByID(ID_MAIN_TextView2);
+    mListView1Ptr = (ZKListView*)findControlByID(ID_MAIN_ListView1);if(mListView1Ptr!= NULL){mListView1Ptr->setListAdapter(this);mListView1Ptr->setItemClickListener(this);}
     mTextView1Ptr = (ZKTextView*)findControlByID(ID_MAIN_TextView1);
     mEditText1Ptr = (ZKEditText*)findControlByID(ID_MAIN_EditText1);if(mEditText1Ptr!= NULL){mEditText1Ptr->setTextChangeListener(this);}
     mButton1Ptr = (ZKButton*)findControlByID(ID_MAIN_Button1);

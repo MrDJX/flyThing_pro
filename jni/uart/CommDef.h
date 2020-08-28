@@ -39,7 +39,7 @@ typedef unsigned short  UINT16;
 
 // 需要打印协议数据时，打开以下宏
 #define DEBUG_PRO_DATA
-
+#define DEBUG_procPars_DATA
 // 支持checksum校验，打开以下宏
 #define PRO_SUPPORT_CHECK_SUM
 //定义帧尾校验，打开以下宏
@@ -81,6 +81,6 @@ typedef unsigned short  UINT16;
 #define FRAME_END1  0xAA
 #define FRAME_END2  0x55
 //协议数据长度
-#define PROTOCOL_DATA_LEN 6
+#define PROTOCOL_DATA_LEN 4
 
 #endif /* _UART_COMMDEF_H_ */
