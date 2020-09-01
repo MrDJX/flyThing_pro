@@ -75,12 +75,29 @@ typedef unsigned short  UINT16;
 #endif
 
 // 同步帧头
-#define FRAME_HEAD1	0xAA
-#define FRAME_HEAD2	0x54
+#define FRAME_HEAD1				0XAA
+#define FRAME_HEAD2				0X54
 //同步帧尾
-#define FRAME_END1  0xAA
-#define FRAME_END2  0x55
-//协议数据长度
+#define FRAME_END1  			0XAA
+#define FRAME_END2 	 			0X55
+
+//协议发送的命令字宏
+#define OPEN_READY				0X0100
+#define CLOSE_READY 			0X0200
+#define OPEN_INDICATOR 			0X0300
+#define CLOSE_INDICATOR 		0X0400
+#define SET_POWER_PER			0X0500
+#define SET_INDCATOR_LEVELS 	0X0600
+#define SET_FREQUENCY			0X0700
+#define SET_DUTY_CYCLE			0X0800
+#define SET_TIMING_TIME			0X0900
+#define SET_SPEAKER_VOLUME		0X0A00
+#define SET_MODE				0X0B00
+#define READ_MACHINE_PARAMETER  0X0C00
+#define CLEAR_WARNING			0X0D00
+
+//发送协议长度
 #define PROTOCOL_DATA_LEN 4
 
 #endif /* _UART_COMMDEF_H_ */
+

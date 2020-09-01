@@ -4,10 +4,34 @@
 #include "mainActivity.h"
 
 /*TAG:GlobalVariable全局变量*/
+static ZKButton* mmodeButtonVPtr;
+static ZKTextView* mvolumeTextPtr;
+static ZKTextView* mtimeTextPtr;
+static ZKTextView* mdutyTextPtr;
+static ZKTextView* mfreqTextPtr;
+static ZKTextView* minstrTextPtr;
+static ZKTextView* mpowerTextPtr;
+static ZKEditText* msetVolumePtr;
+static ZKEditText* msetTimePtr;
+static ZKEditText* msetDutyPtr;
+static ZKEditText* msetFreqPtr;
+static ZKEditText* msetInstrPtr;
+static ZKButton* mclrWarningButtonPtr;
+static ZKButton* mreadParmButtonPtr;
+static ZKButton* msetModeButtonPtr;
+static ZKButton* msetVolumeButtonPtr;
+static ZKButton* msetTimeButtonPtr;
+static ZKButton* msetDutyButtonPtr;
+static ZKButton* msetFreqButtonPtr;
+static ZKButton* msetInstrButtonPtr;
+static ZKButton* msetPowerButtonPtr;
+static ZKEditText* mSetPowerPtr;
+static ZKButton* mButton4Ptr;
+static ZKButton* mButton3Ptr;
+static ZKButton* mButton2Ptr;
 static ZKTextView* mTextView2Ptr;
 static ZKListView* mListView1Ptr;
 static ZKTextView* mTextView1Ptr;
-static ZKEditText* mEditText1Ptr;
 static ZKButton* mButton1Ptr;
 static mainActivity* mActivityPtr;
 
@@ -46,6 +70,19 @@ typedef struct {
 
 /*TAG:ButtonCallbackTab按键映射表*/
 static S_ButtonCallback sButtonCallbackTab[] = {
+    ID_MAIN_modeButtonV, onButtonClick_modeButtonV,
+    ID_MAIN_clrWarningButton, onButtonClick_clrWarningButton,
+    ID_MAIN_readParmButton, onButtonClick_readParmButton,
+    ID_MAIN_setModeButton, onButtonClick_setModeButton,
+    ID_MAIN_setVolumeButton, onButtonClick_setVolumeButton,
+    ID_MAIN_setTimeButton, onButtonClick_setTimeButton,
+    ID_MAIN_setDutyButton, onButtonClick_setDutyButton,
+    ID_MAIN_setFreqButton, onButtonClick_setFreqButton,
+    ID_MAIN_setInstrButton, onButtonClick_setInstrButton,
+    ID_MAIN_setPowerButton, onButtonClick_setPowerButton,
+    ID_MAIN_Button4, onButtonClick_Button4,
+    ID_MAIN_Button3, onButtonClick_Button3,
+    ID_MAIN_Button2, onButtonClick_Button2,
     ID_MAIN_Button1, onButtonClick_Button1,
 };
 /***************/
@@ -93,7 +130,12 @@ typedef struct {
 }S_EditTextInputCallback;
 /*TAG:EditTextInputCallback*/
 static S_EditTextInputCallback SEditTextInputCallbackTab[] = {
-    ID_MAIN_EditText1, onEditTextChanged_EditText1,
+    ID_MAIN_setVolume, onEditTextChanged_setVolume,
+    ID_MAIN_setTime, onEditTextChanged_setTime,
+    ID_MAIN_setDuty, onEditTextChanged_setDuty,
+    ID_MAIN_setFreq, onEditTextChanged_setFreq,
+    ID_MAIN_setInstr, onEditTextChanged_setInstr,
+    ID_MAIN_SetPower, onEditTextChanged_SetPower,
 };
 
 typedef void (*VideoViewCallback)(ZKVideoView *pVideoView, int msg);
@@ -129,10 +171,34 @@ const char* mainActivity::getAppName() const{
 //TAG:onCreate
 void mainActivity::onCreate() {
 	Activity::onCreate();
+    mmodeButtonVPtr = (ZKButton*)findControlByID(ID_MAIN_modeButtonV);
+    mvolumeTextPtr = (ZKTextView*)findControlByID(ID_MAIN_volumeText);
+    mtimeTextPtr = (ZKTextView*)findControlByID(ID_MAIN_timeText);
+    mdutyTextPtr = (ZKTextView*)findControlByID(ID_MAIN_dutyText);
+    mfreqTextPtr = (ZKTextView*)findControlByID(ID_MAIN_freqText);
+    minstrTextPtr = (ZKTextView*)findControlByID(ID_MAIN_instrText);
+    mpowerTextPtr = (ZKTextView*)findControlByID(ID_MAIN_powerText);
+    msetVolumePtr = (ZKEditText*)findControlByID(ID_MAIN_setVolume);if(msetVolumePtr!= NULL){msetVolumePtr->setTextChangeListener(this);}
+    msetTimePtr = (ZKEditText*)findControlByID(ID_MAIN_setTime);if(msetTimePtr!= NULL){msetTimePtr->setTextChangeListener(this);}
+    msetDutyPtr = (ZKEditText*)findControlByID(ID_MAIN_setDuty);if(msetDutyPtr!= NULL){msetDutyPtr->setTextChangeListener(this);}
+    msetFreqPtr = (ZKEditText*)findControlByID(ID_MAIN_setFreq);if(msetFreqPtr!= NULL){msetFreqPtr->setTextChangeListener(this);}
+    msetInstrPtr = (ZKEditText*)findControlByID(ID_MAIN_setInstr);if(msetInstrPtr!= NULL){msetInstrPtr->setTextChangeListener(this);}
+    mclrWarningButtonPtr = (ZKButton*)findControlByID(ID_MAIN_clrWarningButton);
+    mreadParmButtonPtr = (ZKButton*)findControlByID(ID_MAIN_readParmButton);
+    msetModeButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setModeButton);
+    msetVolumeButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setVolumeButton);
+    msetTimeButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setTimeButton);
+    msetDutyButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setDutyButton);
+    msetFreqButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setFreqButton);
+    msetInstrButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setInstrButton);
+    msetPowerButtonPtr = (ZKButton*)findControlByID(ID_MAIN_setPowerButton);
+    mSetPowerPtr = (ZKEditText*)findControlByID(ID_MAIN_SetPower);if(mSetPowerPtr!= NULL){mSetPowerPtr->setTextChangeListener(this);}
+    mButton4Ptr = (ZKButton*)findControlByID(ID_MAIN_Button4);
+    mButton3Ptr = (ZKButton*)findControlByID(ID_MAIN_Button3);
+    mButton2Ptr = (ZKButton*)findControlByID(ID_MAIN_Button2);
     mTextView2Ptr = (ZKTextView*)findControlByID(ID_MAIN_TextView2);
     mListView1Ptr = (ZKListView*)findControlByID(ID_MAIN_ListView1);if(mListView1Ptr!= NULL){mListView1Ptr->setListAdapter(this);mListView1Ptr->setItemClickListener(this);}
     mTextView1Ptr = (ZKTextView*)findControlByID(ID_MAIN_TextView1);
-    mEditText1Ptr = (ZKEditText*)findControlByID(ID_MAIN_EditText1);if(mEditText1Ptr!= NULL){mEditText1Ptr->setTextChangeListener(this);}
     mButton1Ptr = (ZKButton*)findControlByID(ID_MAIN_Button1);
 	mActivityPtr = this;
 	onUI_init();

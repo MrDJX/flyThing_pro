@@ -26,11 +26,36 @@
 #include "window/ZKSlideWindow.h"
 
 /*TAG:Macro宏ID*/
+#define ID_MAIN_modeButtonV    20016
+#define ID_MAIN_volumeText    50008
+#define ID_MAIN_timeText    50007
+#define ID_MAIN_dutyText    50006
+#define ID_MAIN_freqText    50005
+#define ID_MAIN_instrText    50004
+#define ID_MAIN_powerText    50003
+#define ID_MAIN_setVolume    51006
+#define ID_MAIN_setTime    51005
+#define ID_MAIN_setDuty    51004
+#define ID_MAIN_setFreq    51003
+#define ID_MAIN_setInstr    51002
+#define ID_MAIN_clrWarningButton    20015
+#define ID_MAIN_readParmButton    20014
+#define ID_MAIN_setModeButton    20013
+#define ID_MAIN_setVolumeButton    20012
+#define ID_MAIN_setTimeButton    20011
+#define ID_MAIN_setDutyButton    20010
+#define ID_MAIN_setFreqButton    20009
+#define ID_MAIN_setInstrButton    20008
+#define ID_MAIN_setPowerButton    20007
+#define ID_MAIN_SetPower    51001
+#define ID_MAIN_Button4    20006
+#define ID_MAIN_Button3    20005
+#define ID_MAIN_Button2    20004
+#define ID_MAIN_SubItem2    20003
 #define ID_MAIN_TextView2    50002
 #define ID_MAIN_SubItem1    20002
 #define ID_MAIN_ListView1    80001
 #define ID_MAIN_TextView1    50001
-#define ID_MAIN_EditText1    51001
 #define ID_MAIN_Button1    20001
 /*TAG:Macro宏ID END*/
 

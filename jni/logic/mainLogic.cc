@@ -33,17 +33,29 @@ static SSendProtocolData sSendProtocolData;
 typedef struct {
 	const char* mainText;
 	const char* subText;
+	const char* subText1;
 } S_TEST_DATA;
 
 static S_TEST_DATA sDataTestTab[] = {
-	{ "帧头", 		"01 02" 		},
-	{ "命令字", 		"0a" 			},
-	{ "序列号", 		"0a"			},
-	{ "数据位", 		"01 02 03 04" 	},
-	{ "校验位", 		"0a" 			},
-	{ "帧尾", 		"01 02" 		}
+	{ "帧头", 		"01 02", 		"01 02" 		},
+	{ "命令字", 		"0a", 			"0a" 			},
+	{ "序列号", 		"0a",			"0a"			},
+	{ "数据位", 		"01 02 03 04", 	"01 02 03 04"	},
+	{ "校验位", 		"0a", 		   	"0a" 			},
+	{ "帧尾", 		"01 02", 		"01 02" 		}
 };
 
+typedef struct{
+	BYTE power;
+	BYTE instr;
+	UINT16 freq;
+	BYTE dutyCycle;
+	UINT16 time;
+	BYTE volume;
+	BYTE mode;
+	BYTE clrWarning;
+}SET_PARAMETER;
+static SET_PARAMETER sSET_PARAMETER;
 /**
  * 注册定时器
  * 填充数组用于注册定时器
@@ -115,6 +127,25 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
 	snprintf(buf5, sizeof(buf5), "%02x %02x", data.Frame_End[0],data.Frame_End[1]);
 	sDataTestTab[5].subText=buf5;
 //	LOGD(" sDataTestTab %s !!!\n", sDataTestTab[0].subText);
+
+	char abuf[16],abuf1[16],abuf2[16],abuf3[16],abuf4[16],abuf5[16];
+	snprintf(abuf, sizeof(abuf), "%02x %02x", FRAME_HEAD1,FRAME_HEAD2);
+	sDataTestTab[0].subText1=abuf;
+	snprintf(abuf1, sizeof(abuf1), "%02x", (BYTE)(sSendProtocolData.CmdCtrlNum>>8));
+	sDataTestTab[1].subText1=abuf1;
+	snprintf(abuf2, sizeof(abuf2), "%02x", (BYTE)(sSendProtocolData.CmdCtrlNum<<8));
+	sDataTestTab[2].subText1=abuf2;
+	snprintf(abuf3, sizeof(abuf3), "%02x %02x %02x %02x", sSendProtocolData.SendProtocolData[0],\
+														sSendProtocolData.SendProtocolData[1],\
+														sSendProtocolData.SendProtocolData[2],\
+														sSendProtocolData.SendProtocolData[3]);
+	sDataTestTab[3].subText1=abuf3;
+	snprintf(abuf4, sizeof(abuf4), "%02x", data.Check_Byte);
+	sDataTestTab[4].subText1=abuf4;
+	snprintf(abuf5, sizeof(abuf5), "%02x %02x", FRAME_END1,FRAME_END2);
+	sDataTestTab[5].subText1=abuf5;
+//	LOGD(" sDataTestTab %s !!!\n", sDataTestTab[5].subText1);
+
 	mListView1Ptr->refreshListView();
 }
 
@@ -130,10 +161,7 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
  */
 static bool onUI_Timer(int id){
 //	LOGD(" send data  %x !!!\n", *data);
-	BYTE data[4]={0x01,0x02,0x03,0x04};
-	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
-	sSendProtocolData.CmdCtrlNum=0x010a;
-	sendProtocol(sSendProtocolData.CmdCtrlNum,sSendProtocolData.SendProtocolData,PROTOCOL_DATA_LEN);
+	mListView1Ptr->refreshListView();
     return true;
 }
 
@@ -160,15 +188,6 @@ static bool onmainActivityTouchEvent(const MotionEvent &ev) {
 	}
 	return false;
 }
-static bool onButtonClick_Button1(ZKButton *pButton) {
-    LOGD(" ButtonClick Button1 !!!\n");
-    return false;
-}
-
-static void onEditTextChanged_EditText1(const std::string &text) {
-    LOGD(" onEditTextChanged_ EditText1 %s !!!\n", text.c_str());
-
-}
 static int getListItemCount_ListView1(const ZKListView *pListView) {
     //LOGD("getListItemCount_ListView1 !\n");
     return (sizeof(sDataTestTab) / sizeof(S_TEST_DATA));
@@ -177,10 +196,195 @@ static int getListItemCount_ListView1(const ZKListView *pListView) {
 static void obtainListItemData_ListView1(ZKListView *pListView,ZKListView::ZKListItem *pListItem, int index) {
     //LOGD(" obtainListItemData_ ListView1  !!!\n");
 	ZKListView::ZKListSubItem* psubText = pListItem->findSubItemByID(ID_MAIN_SubItem1);
+	ZKListView::ZKListSubItem* psubText1 = pListItem->findSubItemByID(ID_MAIN_SubItem2);
 	psubText->setText(sDataTestTab[index].subText);
+	psubText1->setText(sDataTestTab[index].subText1);
 	pListItem->setText(sDataTestTab[index].mainText);
+
+}
+static bool onButtonClick_Button1(ZKButton *pButton) {
+    LOGD(" ButtonClick Button1 !!!\n");
+	BYTE data[4]={0};
+	sSendProtocolData.CmdCtrlNum=OPEN_READY;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+static bool onButtonClick_Button2(ZKButton *pButton) {
+    LOGD(" ButtonClick Button2 !!!\n");
+	BYTE data[4]={0};
+//	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=CLOSE_READY;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
 }
 
+static bool onButtonClick_Button3(ZKButton *pButton) {
+    LOGD(" ButtonClick Button3 !!!\n");
+	BYTE data[4]={0};
+	sSendProtocolData.CmdCtrlNum=OPEN_INDICATOR;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_Button4(ZKButton *pButton) {
+    LOGD(" ButtonClick Button4 !!!\n");
+	BYTE data[4]={0};
+	sSendProtocolData.CmdCtrlNum=CLOSE_INDICATOR;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_setPowerButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setPowerButton !!!\n");
+	BYTE data[4]={0,0,0,sSET_PARAMETER.power};
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=SET_POWER_PER;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+static bool onButtonClick_setInstrButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setInstrButton !!!\n");
+	BYTE data[4]={0,0,0,sSET_PARAMETER.instr};
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=SET_INDCATOR_LEVELS;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_setFreqButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setFreqButton !!!\n");
+	BYTE data[4]={0,0,(BYTE)(sSET_PARAMETER.freq>>8),(BYTE)(sSET_PARAMETER.freq&0x00ff)};
+//	LOGD("sSET_PARAMETER.freq %x,%x !!!\n",data[2],data[3]);
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=SET_FREQUENCY;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_setDutyButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setDutyButton !!!\n");
+	BYTE data[4]={0,0,0,sSET_PARAMETER.dutyCycle};
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=SET_DUTY_CYCLE;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_setTimeButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setTimeButton !!!\n");
+	BYTE data[4]={0,0,(BYTE)(sSET_PARAMETER.time>>8),(BYTE)(sSET_PARAMETER.time&0x00ff)};
+//	LOGD("sSET_PARAMETER.freq %x,%x !!!\n",data[2],data[3]);
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=SET_TIMING_TIME;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_setVolumeButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setVolumeButton !!!\n");
+    BYTE data[4]={0,0,0,sSET_PARAMETER.volume};
+	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=SET_SPEAKER_VOLUME;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+static bool onButtonClick_readParmButton(ZKButton *pButton) {
+    LOGD(" ButtonClick readParmButton !!!\n");
+    BYTE data[4]={0};
+//	memcpy(&sSendProtocolData.SendProtocolData,&data,sizeof(data));
+	sSendProtocolData.CmdCtrlNum=READ_MACHINE_PARAMETER;
+	sendProtocol(sSendProtocolData.CmdCtrlNum,data,PROTOCOL_DATA_LEN);
+    return false;
+}
+
+static bool onButtonClick_clrWarningButton(ZKButton *pButton) {
+    LOGD(" ButtonClick clrWarningButton !!!\n");
+    return false;
+}
+static void onEditTextChanged_SetPower(const std::string &text) {
+	if(atoi(text.c_str())>100){
+		mSetPowerPtr->setTextColor(0xFF0000);
+		sSET_PARAMETER.power=0;
+	}
+	else{
+		mSetPowerPtr->setTextColor(0x000000);
+		sSET_PARAMETER.power=atoi(text.c_str());
+	}
+    LOGD(" onEditTextChanged_ SetPower %d !!!\n", atoi(text.c_str()));
+}
+static void onEditTextChanged_setInstr(const std::string &text) {
+    //LOGD(" onEditTextChanged_ setInstr %s !!!\n", text.c_str());
+	if(atoi(text.c_str())>7){
+		msetInstrPtr->setTextColor(0xFF0000);
+		sSET_PARAMETER.instr=0;
+	}
+	else{
+		msetInstrPtr->setTextColor(0x000000);
+		sSET_PARAMETER.instr=atoi(text.c_str());
+	}
+    LOGD(" onEditTextChanged_ instr %d !!!\n", atoi(text.c_str()));
+}
+
+static void onEditTextChanged_setFreq(const std::string &text) {
+    //LOGD(" onEditTextChanged_ setFreq %s !!!\n", text.c_str());
+	if(atoi(text.c_str())>10000){
+		msetFreqPtr->setTextColor(0xFF0000);
+		sSET_PARAMETER.freq=0;
+	}
+	else{
+		msetFreqPtr->setTextColor(0x000000);
+		sSET_PARAMETER.freq=atoi(text.c_str());
+	}
+    LOGD(" onEditTextChanged_ setFreq %x !!!\n", atoi(text.c_str()));
+}
+
+static void onEditTextChanged_setDuty(const std::string &text) {
+    //LOGD(" onEditTextChanged_ setDuty %s !!!\n", text.c_str());
+	if(atoi(text.c_str())>100){
+		msetDutyPtr->setTextColor(0xFF0000);
+		sSET_PARAMETER.dutyCycle=0;
+	}
+	else{
+		msetDutyPtr->setTextColor(0x000000);
+		sSET_PARAMETER.dutyCycle=atoi(text.c_str());
+	}
+    LOGD(" onEditTextChanged_ setDuty %d !!!\n", atoi(text.c_str()));
+}
+
+static void onEditTextChanged_setTime(const std::string &text) {
+    //LOGD(" onEditTextChanged_ setTime %s !!!\n", text.c_str());
+	if(atoi(text.c_str())>65535){
+		msetTimePtr->setTextColor(0xFF0000);
+		sSET_PARAMETER.time=0;
+	}
+	else{
+		msetTimePtr->setTextColor(0x000000);
+		sSET_PARAMETER.time=atoi(text.c_str());
+	}
+}
+
+static void onEditTextChanged_setVolume(const std::string &text) {
+    //LOGD(" onEditTextChanged_ setVolume %s !!!\n", text.c_str());
+	if(atoi(text.c_str())>100){
+		msetVolumePtr->setTextColor(0xFF0000);
+		sSET_PARAMETER.volume=0;
+	}
+	else{
+		msetVolumePtr->setTextColor(0x000000);
+		sSET_PARAMETER.volume=atoi(text.c_str());
+	}
+}
+
+static bool onButtonClick_modeButtonV(ZKButton *pButton) {
+    LOGD(" ButtonClick modeButtonV !!!\n");
+    pButton->setSelected(!pButton->isSelected());
+    return false;
+}
 static void onListItemClick_ListView1(ZKListView *pListView, int index, int id) {
     //LOGD(" onListItemClick_ ListView1  !!!\n");
+}
+
+static bool onButtonClick_setModeButton(ZKButton *pButton) {
+    LOGD(" ButtonClick setModeButton !!!\n");
+    return false;
 }
