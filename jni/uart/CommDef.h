@@ -96,8 +96,7 @@ typedef unsigned short  UINT16;
 #define READ_MACHINE_PARAMETER  0X0C00
 #define CLEAR_WARNING			0X0D00
 
-//发送协议长度
-#define PROTOCOL_DATA_LEN 4
+#define PROTOCOL_DATA_LEN 		4
 
 #endif /* _UART_COMMDEF_H_ */
 

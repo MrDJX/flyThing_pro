@@ -26,6 +26,8 @@
 #include "window/ZKSlideWindow.h"
 
 /*TAG:Macro宏ID*/
+#define ID_MAIN_SubItem3    20017
+#define ID_MAIN_ListView2    80002
 #define ID_MAIN_modeButtonV    20016
 #define ID_MAIN_volumeText    50008
 #define ID_MAIN_timeText    50007

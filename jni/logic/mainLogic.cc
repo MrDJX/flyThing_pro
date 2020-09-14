@@ -1,6 +1,6 @@
 #pragma once
 #include "uart/ProtocolSender.h"
-static SSendProtocolData sSendProtocolData;
+SSendProtocolData sSendProtocolData;
 /*
 *此文件由GUI工具生成
 *文件功能：用于处理用户的逻辑相应代码
@@ -44,7 +44,26 @@ static S_TEST_DATA sDataTestTab[] = {
 	{ "校验位", 		"0a", 		   	"0a" 			},
 	{ "帧尾", 		"01 02", 		"01 02" 		}
 };
-
+static S_TEST_DATA sDataTestTab1[] = {
+	{ "激光状态：", 	"开启"			},
+	{ "发射状态：", 	"未发射"			},
+	{ "功率：", 		"10.0W"			},
+	{ "10X电源电压：", 	"10.0V"			},
+	{ "剩余时间：", 	"32767.500s"	},
+	{ "10X温度:", 		"20℃"		},
+	{ "报警信息：", 		"请连接光纤"	}
+};
+static char *WarningCharTab[] = {
+	"安全锁未连接",
+	"请连接适配器",
+	"请释放脚踏",
+	"请连接光纤",
+	"请连接脚踏",
+	"安全锁未使能",
+	"NTC断开",
+	"温度过高",
+	"电流不稳定"
+};
 typedef struct{
 	BYTE power;
 	BYTE instr;
@@ -62,7 +81,7 @@ static SET_PARAMETER sSET_PARAMETER;
  * 注意：id不能重复
  */
 static S_ACTIVITY_TIMEER REGISTER_ACTIVITY_TIMER_TAB[1] = {
-	{0,  2000}, //定时器id=0, 时间间隔6秒
+//	{0,  2000}, //定时器id=0, 时间间隔6秒
 	//{1,  1000},
 };
 
@@ -110,17 +129,26 @@ static void onUI_quit() {
 static void onProtocolDataUpdate(const SProtocolData &data) {
 
 //	LOGD(" read data 0x%x 0x%x !!!\n", data.Frame_Head[0],data.Frame_Head[1]);
-	char buf[16],buf1[16],buf2[16],buf3[16],buf4[16],buf5[16];
+	char buf[16],buf1[16],buf2[16],buf3[40],buf4[16],buf5[16];
 	snprintf(buf, sizeof(buf), "%02x %02x", data.Frame_Head[0],data.Frame_Head[1]);
 	sDataTestTab[0].subText=buf;
 	snprintf(buf1, sizeof(buf1), "%02x", data.Cmd_Byte);
 	sDataTestTab[1].subText=buf1;
 	snprintf(buf2, sizeof(buf2), "%02x", data.ID_Byte);
 	sDataTestTab[2].subText=buf2;
-	snprintf(buf3, sizeof(buf3), "%02x %02x %02x %02x", data.ProtocolData[0],\
+	snprintf(buf3, sizeof(buf3), "%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", \
+											  data.ProtocolData[0],\
 											  data.ProtocolData[1],\
 											  data.ProtocolData[2],\
-											  data.ProtocolData[3]);
+											  data.ProtocolData[3],\
+											  data.ProtocolData[4],\
+											  data.ProtocolData[5],\
+											  data.ProtocolData[6],\
+											  data.ProtocolData[7],\
+											  data.ProtocolData[8],\
+											  data.ProtocolData[9],\
+											  data.ProtocolData[10],\
+											  data.ProtocolData[11]);
 	sDataTestTab[3].subText=buf3;
 	snprintf(buf4, sizeof(buf4), "%02x", data.Check_Byte);
 	sDataTestTab[4].subText=buf4;
@@ -140,13 +168,58 @@ static void onProtocolDataUpdate(const SProtocolData &data) {
 														sSendProtocolData.SendProtocolData[2],\
 														sSendProtocolData.SendProtocolData[3]);
 	sDataTestTab[3].subText1=abuf3;
-	snprintf(abuf4, sizeof(abuf4), "%02x", data.Check_Byte);
+	BYTE check;
+	check=((BYTE)(sSendProtocolData.CmdCtrlNum>>8)+(BYTE)(sSendProtocolData.CmdCtrlNum<<8)+\
+			sSendProtocolData.SendProtocolData[0]+sSendProtocolData.SendProtocolData[1]+\
+			sSendProtocolData.SendProtocolData[2]+sSendProtocolData.SendProtocolData[3])&0xff;
+	snprintf(abuf4, sizeof(abuf4), "%02x", check);
 	sDataTestTab[4].subText1=abuf4;
 	snprintf(abuf5, sizeof(abuf5), "%02x %02x", FRAME_END1,FRAME_END2);
 	sDataTestTab[5].subText1=abuf5;
 //	LOGD(" sDataTestTab %s !!!\n", sDataTestTab[5].subText1);
-
 	mListView1Ptr->refreshListView();
+
+	if(data.Cmd_Byte==0x8c)
+	{
+		if(data.ProtocolData[0]==0x01)
+			sDataTestTab1[0].subText="开启";
+		else
+			sDataTestTab1[0].subText="关闭";
+		if(data.ProtocolData[1]==0x01)
+			sDataTestTab1[1].subText="发射完成";
+		else
+			sDataTestTab1[1].subText="未发射";
+		char pbuf[32],pbuf1[32],pbuf2[32],pbuf3[32];
+		snprintf(pbuf, sizeof(pbuf), "%.3f W ", (((UINT16)data.ProtocolData[2]<<8)\
+												+data.ProtocolData[3])/1000.0);
+		sDataTestTab1[2].subText=pbuf;
+		snprintf(pbuf1, sizeof(pbuf1), "%.1f V ", (((UINT16)data.ProtocolData[4]<<8)\
+												+data.ProtocolData[5])/10.0);
+		sDataTestTab1[3].subText=pbuf1;
+		snprintf(pbuf2, sizeof(pbuf2), "%.1f s ", ((((UINT16)data.ProtocolData[6]<<8)\
+												+data.ProtocolData[7])*500)/1000.0);
+		sDataTestTab1[4].subText=pbuf2;
+		snprintf(pbuf3, sizeof(pbuf3), "%.1f ℃ ", (((UINT16)data.ProtocolData[8]<<8)\
+												+data.ProtocolData[9])/10.0);
+		sDataTestTab1[5].subText=pbuf3;
+		UINT16 wbuf;
+		BYTE i=0;
+		wbuf=((UINT16)(data.ProtocolData[10]<<8)+(data.ProtocolData[11]<<7))>>7;
+//		LOGD("  wbuf %X !!!\n", wbuf);
+		for (i=9;i>0;i--){
+//			LOGD("  wbuf %X !!!\n", wbuf);
+			if((wbuf&0x1)!=0){
+
+//				LOGD("  WarningCharTab %s !!!\n", WarningCharTab[i]);
+				sDataTestTab1[6].subText=WarningCharTab[i-1];break;
+			}
+			else{
+				sDataTestTab1[6].subText="无报警";
+			}
+			wbuf=(wbuf>>1);
+		}
+	}
+	mListView2Ptr->refreshListView();
 }
 
 /**
@@ -192,7 +265,6 @@ static int getListItemCount_ListView1(const ZKListView *pListView) {
     //LOGD("getListItemCount_ListView1 !\n");
     return (sizeof(sDataTestTab) / sizeof(S_TEST_DATA));
 }
-
 static void obtainListItemData_ListView1(ZKListView *pListView,ZKListView::ZKListItem *pListItem, int index) {
     //LOGD(" obtainListItemData_ ListView1  !!!\n");
 	ZKListView::ZKListSubItem* psubText = pListItem->findSubItemByID(ID_MAIN_SubItem1);
@@ -201,6 +273,24 @@ static void obtainListItemData_ListView1(ZKListView *pListView,ZKListView::ZKLis
 	psubText1->setText(sDataTestTab[index].subText1);
 	pListItem->setText(sDataTestTab[index].mainText);
 
+}
+static void onListItemClick_ListView1(ZKListView *pListView, int index, int id) {
+    //LOGD(" onListItemClick_ ListView1  !!!\n");
+}
+static int getListItemCount_ListView2(const ZKListView *pListView) {
+    //LOGD("getListItemCount_ListView2 !\n");
+    return sizeof(sDataTestTab1) / sizeof(S_TEST_DATA);
+}
+
+static void obtainListItemData_ListView2(ZKListView *pListView,ZKListView::ZKListItem *pListItem, int index) {
+    //LOGD(" obtainListItemData_ ListView2  !!!\n");
+	ZKListView::ZKListSubItem* psubText = pListItem->findSubItemByID(ID_MAIN_SubItem3);
+	psubText->setText(sDataTestTab1[index].subText);
+	pListItem->setText(sDataTestTab1[index].mainText);
+}
+
+static void onListItemClick_ListView2(ZKListView *pListView, int index, int id) {
+    //LOGD(" onListItemClick_ ListView2  !!!\n");
 }
 static bool onButtonClick_Button1(ZKButton *pButton) {
     LOGD(" ButtonClick Button1 !!!\n");
@@ -380,11 +470,10 @@ static bool onButtonClick_modeButtonV(ZKButton *pButton) {
     pButton->setSelected(!pButton->isSelected());
     return false;
 }
-static void onListItemClick_ListView1(ZKListView *pListView, int index, int id) {
-    //LOGD(" onListItemClick_ ListView1  !!!\n");
-}
+
 
 static bool onButtonClick_setModeButton(ZKButton *pButton) {
     LOGD(" ButtonClick setModeButton !!!\n");
     return false;
 }
+

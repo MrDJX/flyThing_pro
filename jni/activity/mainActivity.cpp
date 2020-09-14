@@ -4,6 +4,7 @@
 #include "mainActivity.h"
 
 /*TAG:GlobalVariable全局变量*/
+static ZKListView* mListView2Ptr;
 static ZKButton* mmodeButtonVPtr;
 static ZKTextView* mvolumeTextPtr;
 static ZKTextView* mtimeTextPtr;
@@ -109,6 +110,7 @@ typedef struct {
 }S_ListViewFunctionsCallback;
 /*TAG:ListViewFunctionsCallback*/
 static S_ListViewFunctionsCallback SListViewFunctionsCallbackTab[] = {
+    ID_MAIN_ListView2, getListItemCount_ListView2, obtainListItemData_ListView2, onListItemClick_ListView2,
     ID_MAIN_ListView1, getListItemCount_ListView1, obtainListItemData_ListView1, onListItemClick_ListView1,
 };
 
@@ -171,6 +173,7 @@ const char* mainActivity::getAppName() const{
 //TAG:onCreate
 void mainActivity::onCreate() {
 	Activity::onCreate();
+    mListView2Ptr = (ZKListView*)findControlByID(ID_MAIN_ListView2);if(mListView2Ptr!= NULL){mListView2Ptr->setListAdapter(this);mListView2Ptr->setItemClickListener(this);}
     mmodeButtonVPtr = (ZKButton*)findControlByID(ID_MAIN_modeButtonV);
     mvolumeTextPtr = (ZKTextView*)findControlByID(ID_MAIN_volumeText);
     mtimeTextPtr = (ZKTextView*)findControlByID(ID_MAIN_timeText);

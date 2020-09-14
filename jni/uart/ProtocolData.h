@@ -23,7 +23,7 @@ typedef struct {
 	BYTE Frame_Head[2];
 	BYTE Cmd_Byte;
 	BYTE ID_Byte;
-	BYTE ProtocolData[PROTOCOL_DATA_LEN];
+	BYTE ProtocolData[12];
 	BYTE Check_Byte;
 	BYTE Frame_End[2];
 } SProtocolData;

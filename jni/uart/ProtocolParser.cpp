@@ -10,6 +10,11 @@
 #include "CommDef.h"
 #include "uart/ProtocolParser.h"
 #include "utils/Log.h"
+#include "uart/ProtocolSender.h"
+
+extern SSendProtocolData sSendProtocolData;
+//发送协议长度
+//BYTE PROTOCOL_DATA_LEN=4;
 
 static Mutex sLock;
 static std::vector<OnProtocolDataUpdateFun> sProtocolDataUpdateListenerList;
@@ -73,17 +78,40 @@ static void procParse(const BYTE *pData, UINT len) {
 		}
 		LOGD("\n");
 #endif
-	sProtocolData.Frame_Head[0]    = pData[0];
-	sProtocolData.Frame_Head[1]    = pData[1];
-	sProtocolData.Cmd_Byte         = pData[2];
-	sProtocolData.ID_Byte          = pData[3];
-	sProtocolData.ProtocolData[0]  = pData[4];
-	sProtocolData.ProtocolData[1]  = pData[5];
-	sProtocolData.ProtocolData[2]  = pData[6];
-	sProtocolData.ProtocolData[3]  = pData[7];
-	sProtocolData.Check_Byte       = pData[8];
-	sProtocolData.Frame_End[0]     = pData[9];
-	sProtocolData.Frame_End[1]     = pData[10];
+		sProtocolData.Frame_Head[0]    = pData[0];
+		sProtocolData.Frame_Head[1]    = pData[1];
+		sProtocolData.Cmd_Byte         = pData[2];
+		sProtocolData.ID_Byte          = pData[3];
+		sProtocolData.ProtocolData[0]  = pData[4];
+		sProtocolData.ProtocolData[1]  = pData[5];
+		sProtocolData.ProtocolData[2]  = pData[6];
+		sProtocolData.ProtocolData[3]  = pData[7];
+	if(sSendProtocolData.CmdCtrlNum==READ_MACHINE_PARAMETER){
+		sProtocolData.ProtocolData[4]  = pData[8];
+		sProtocolData.ProtocolData[5]  = pData[9];
+		sProtocolData.ProtocolData[6]  = pData[10];
+		sProtocolData.ProtocolData[7]  = pData[11];
+		sProtocolData.ProtocolData[8]  = pData[12];
+		sProtocolData.ProtocolData[9]  = pData[13];
+		sProtocolData.ProtocolData[10]  = pData[14];
+		sProtocolData.ProtocolData[11]  = pData[15];
+		sProtocolData.Check_Byte       = pData[16];
+		sProtocolData.Frame_End[0]     = pData[17];
+		sProtocolData.Frame_End[1]     = pData[18];
+	}
+	else{
+		sProtocolData.ProtocolData[4]  = 0;
+		sProtocolData.ProtocolData[5]  = 0;
+		sProtocolData.ProtocolData[6]  = 0;
+		sProtocolData.ProtocolData[7]  = 0;
+		sProtocolData.ProtocolData[8]  = 0;
+		sProtocolData.ProtocolData[9]  = 0;
+		sProtocolData.ProtocolData[10]  = 0;
+		sProtocolData.ProtocolData[11]  = 0;
+		sProtocolData.Check_Byte       = pData[8];
+		sProtocolData.Frame_End[0]     = pData[9];
+		sProtocolData.Frame_End[1]     = pData[10];
+	}
 	// 通知协议数据更新
 	notifyProtocolDataUpdate(sProtocolData);
 }
@@ -95,7 +123,7 @@ static void procParse(const BYTE *pData, UINT len) {
  */
 int parseProtocol(const BYTE *pData, UINT len) {
 	UINT remainLen = len;	// 剩余数据长度
-	UINT dataLen;	// 数据包长度
+	UINT dataLen=4;	// 数据包长度
 	UINT frameLen;	// 帧长度
 
 	/**
@@ -112,8 +140,12 @@ int parseProtocol(const BYTE *pData, UINT len) {
 		if (remainLen < DATA_PACKAGE_MIN_LEN) {
 			break;
 		}
-
-		dataLen = PROTOCOL_DATA_LEN;
+		if(sSendProtocolData.CmdCtrlNum==READ_MACHINE_PARAMETER){
+			dataLen = 12;
+		}
+		else{
+			dataLen = 4;
+		}
 		frameLen = dataLen + DATA_PACKAGE_MIN_LEN -1;
 		LOGD("frameLen %d ", frameLen);
 		if (frameLen > remainLen) {

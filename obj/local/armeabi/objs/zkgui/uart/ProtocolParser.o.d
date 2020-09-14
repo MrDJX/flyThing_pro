@@ -154,7 +154,8 @@ E:/flyThing_pro/test_uart/obj/local/armeabi/objs/zkgui/uart/ProtocolParser.o: \
  D:\zkswe\flythings\bin\/../sdk/platforms/z11s/prebuilt/include/stlport/stl/_num_get.c \
  D:\zkswe\flythings\bin\/../sdk/platforms/z11s/prebuilt/include/stlport/stl/_string_io.c \
  E:/flyThing_pro/test_uart/jni/include/utils/Log.h \
- D:/zkswe/flythings/sdk/platforms/z11s/toolchain/bin/platforms/android-9/arch-arm/usr/include/android/log.h
+ D:/zkswe/flythings/sdk/platforms/z11s/toolchain/bin/platforms/android-9/arch-arm/usr/include/android/log.h \
+ E:/flyThing_pro/test_uart/jni/uart/ProtocolSender.h
 
 D:\zkswe\flythings\bin\/../sdk/platforms/z11s/prebuilt/include/stlport/vector:
 
@@ -465,3 +466,5 @@ D:\zkswe\flythings\bin\/../sdk/platforms/z11s/prebuilt/include/stlport/stl/_stri
 E:/flyThing_pro/test_uart/jni/include/utils/Log.h:
 
 D:/zkswe/flythings/sdk/platforms/z11s/toolchain/bin/platforms/android-9/arch-arm/usr/include/android/log.h:
+
+E:/flyThing_pro/test_uart/jni/uart/ProtocolSender.h:
